@@ -8,7 +8,6 @@ In order to run the app, it is recommended you first create and activate a virtu
 
 ```
 python3 -m venv venv
-
 source venv/bin/activate
 ```
 
