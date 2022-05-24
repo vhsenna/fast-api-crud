@@ -1,5 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 import schemas
+from models import Item
+from database import engine, base, session_local
+from sqlalchemy.orm import Session
+
+base.metadata.create_all(engine)
+
+def get_session():
+    session = session_local()
+    try:
+        yield session
+    finally:
+        session.close()
 
 app = FastAPI()
 
