@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 import schemas
-from models import Item
+import models
 from database import engine, base, session_local
 from sqlalchemy.orm import Session
 
@@ -15,32 +15,35 @@ def get_session():
 
 app = FastAPI()
 
-fake_database = {
-    1:{'task': 'Clean kitchen'},
-    2:{'task': 'Buy cheese'},
-    3:{'task': 'Write blog'},
-}
-
 @app.get('/')
-def get_items():
-    return fake_database
+def get_items(session: Session=Depends(get_session)):
+    items = session.query(models.Item).all()
+    return items
 
 @app.get('/{id}')
-def get_item(id:int):
-    return fake_database[id]
+def get_item(id:int, session: Session=Depends(get_session)):
+    item = session.query(models.Item).get(id)
+    return item
 
 @app.post('/')
-def add_item(item:schemas.Item):
-    new_id = len(fake_database.keys()) + 1
-    fake_database[new_id] = {'task': item.task}
-    return fake_database
+def add_item(item:schemas.Item, session: Session=Depends(get_session)):
+    item = models.Item(task=item.task)
+    session.add(item)
+    session.commit()
+    session.refresh(item)
+    return item
 
 @app.put('/{id}')
-def update_item(id:int, item:schemas.Item):
-    fake_database[id]['task'] = item.task
-    return fake_database
+def update_item(id:int, item:schemas.Item, session=Depends(get_session)):
+    item_object = session.query(models.Item).get(id)
+    item_object.task = item.task
+    session.commit()
+    return item_object
 
 @app.delete('/{id}')
-def delete_item(id:int):
-    del fake_database[id]
-    return fake_database
+def deleteItem(id:int, session = Depends(get_session)):
+    item_object = session.query(models.Item).get(id)
+    session.delete(item_object)
+    session.commit()
+    session.close()
+    return 'Item was deleted'
