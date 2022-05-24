@@ -2,6 +2,12 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+fake_database = {
+    1:{'task': 'Clean kitchen'},
+    2:{'task': 'Buy cheese'},
+    3:{'task': 'Write blog'},
+}
+
 @app.get('/')
 def get_items():
-    return ['Item1', 'Item2', 'Item3']
+    return fake_database
