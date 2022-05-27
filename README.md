@@ -1,4 +1,4 @@
-# FastAPI CRUD App
+# FastAPI CRUD
 
 This is a simple app designed to play around with FastAPI with a basic CRUD app.
 
